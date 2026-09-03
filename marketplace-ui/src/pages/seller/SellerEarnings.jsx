@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sellersAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function SellerEarnings() {
   const [stats, setStats] = useState(null);
@@ -25,19 +26,19 @@ export default function SellerEarnings() {
 
       <div className="grid-3" style={{ marginBottom: 'var(--space-xl)' }}>
         <div className="stat-card accent-stat">
-          <span className="stat-icon">💰</span>
+          <span className="stat-icon"><Icon name="coins" size={20} /></span>
           <span className="stat-label">Total Gross Sales</span>
           <span className="stat-value">₹{stats?.totalGrossSales?.toLocaleString() || '0'}</span>
           <span className="stat-hint">Across {stats?.totalProducts || 0} products</span>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">🏦</span>
+          <span className="stat-icon"><Icon name="trendingUp" size={20} /></span>
           <span className="stat-label">Net Earnings</span>
           <span className="stat-value">₹{stats?.netEarnings?.toLocaleString() || '0'}</span>
           <span className="stat-hint">After {commission}% commission</span>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">✅</span>
+          <span className="stat-icon"><Icon name="check" size={20} /></span>
           <span className="stat-label">Paid Out</span>
           <span className="stat-value">₹{stats?.paidOut?.toLocaleString() || '0'}</span>
           <span className="stat-hint">Settled to your bank</span>
@@ -47,7 +48,7 @@ export default function SellerEarnings() {
       <div className="card">
         <h3 style={{ marginBottom: 'var(--space-md)' }}>Payout History</h3>
         <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
-          <div className="icon">💸</div>
+          <span className="icon"><Icon name="creditCard" size={32} /></span>
           <p>No payouts yet. Earnings will appear here once your orders are delivered.</p>
           <p className="text-muted text-sm" style={{ marginTop: '0.5rem' }}>
             Payouts are settled automatically to your registered bank account.

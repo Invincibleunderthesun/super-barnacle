@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Icon from './components/Icon';
 
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
@@ -46,20 +47,20 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 // Sidebar link configs
 const userLinks = [
-  { path: '/dashboard/orders', label: 'My Orders', icon: '📋' },
-  { path: '/dashboard/addresses', label: 'Addresses', icon: '📍' },
-  { path: '/dashboard/profile', label: 'Profile', icon: '👤' },
+  { path: '/dashboard/orders', label: 'My Orders', icon: 'file' },
+  { path: '/dashboard/addresses', label: 'Addresses', icon: 'mapPin' },
+  { path: '/dashboard/profile', label: 'Profile', icon: 'user' },
 ];
 const sellerLinks = [
-  { path: '/seller/dashboard', label: 'Overview', icon: '📊' },
-  { path: '/seller/dashboard/products', label: 'Products', icon: '📦' },
-  { path: '/seller/dashboard/orders', label: 'Orders', icon: '📋' },
-  { path: '/seller/dashboard/earnings', label: 'Earnings', icon: '💰' },
+  { path: '/seller/dashboard', label: 'Overview', icon: 'dashboard' },
+  { path: '/seller/dashboard/products', label: 'Products', icon: 'package' },
+  { path: '/seller/dashboard/orders', label: 'Orders', icon: 'file' },
+  { path: '/seller/dashboard/earnings', label: 'Earnings', icon: 'coins' },
 ];
 const adminLinks = [
-  { path: '/admin', label: 'Overview', icon: '📊' },
-  { path: '/admin/users', label: 'Users', icon: '👥' },
-  { path: '/admin/orders', label: 'Orders', icon: '📋' },
+  { path: '/admin', label: 'Overview', icon: 'dashboard' },
+  { path: '/admin/users', label: 'Users', icon: 'users' },
+  { path: '/admin/orders', label: 'Orders', icon: 'file' },
 ];
 
 function AppRoutes() {
@@ -125,7 +126,7 @@ function AppRoutes() {
       <Route path="*" element={
         <PublicLayout>
           <div className="empty-state" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="icon" style={{ fontSize: '4rem' }}>🔍</div>
+            <span className="icon"><Icon name="search" size={48} /></span>
             <h2>Page Not Found</h2>
             <p className="text-secondary">The page you&apos;re looking for doesn&apos;t exist.</p>
           </div>

@@ -1,14 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { productsAPI } from '../../api';
+import { productsAPI, cartAPI } from '../../api';
+import { useAuth } from '../../context/AuthContext';
 import ProductCard from '../../components/ProductCard';
+import Icon from '../../components/Icon';
 
-const categories = ['All', 'electronics', 'fashion', 'home', 'beauty', 'books', 'sports'];
+const categories = [
+  { label: 'All', query: '' },
+  { label: 'Electronics', query: 'Electronics', hue: 'var(--hue-electronics)' },
+  { label: 'Computers', query: 'Computers', hue: 'var(--hue-books)' },
+  { label: 'Accessories', query: 'Accessories', hue: 'var(--hue-fashion)' },
+  { label: 'Home & Office', query: 'Home & Office', hue: 'var(--hue-home)' },
+];
 
 export default function Catalog() {
+  const { user, isAuthenticated } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
+  const [addingId, setAddingId] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = parseInt(searchParams.get('page') || '0');
@@ -36,8 +46,8 @@ export default function Catalog() {
     setSearchParams(searchInput ? { q: searchInput, page: '0' } : {});
   };
 
-  const pickCategory = (cat) => {
-    setSearchParams(cat === 'All' ? {} : { q: cat, page: '0' });
+  const pickCategory = (q) => {
+    setSearchParams(q ? { q, page: '0' } : {});
   };
 
   const goToPage = (p) => {
@@ -47,55 +57,98 @@ export default function Catalog() {
     setSearchParams(params);
   };
 
+  const handleAdd = useCallback(async (product) => {
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    setAddingId(product.id);
+    try {
+      await cartAPI.add(user.id, product.id, 1);
+    } catch (err) {
+      alert(err.message || 'Could not add to cart');
+    } finally {
+      setAddingId(null);
+    }
+  }, [isAuthenticated, user]);
+
   return (
-    <div className="container" style={{ padding: 'var(--space-xl) var(--space-lg)' }}>
-      <div className="section-head" style={{ marginBottom: 'var(--space-lg)' }}>
-        <h1>Product Catalog</h1>
-        <form onSubmit={handleSearch} className="search-bar">
-          <input
-            type="search" placeholder="Search products..."
-            value={searchInput} onChange={e => setSearchInput(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary">Search</button>
-        </form>
-      </div>
-
-      <div className="category-strip" style={{ marginBottom: 'var(--space-lg)', justifyContent: 'flex-start' }}>
-        {categories.map(cat => (
-          <button
-            key={cat}
-            className={`category-pill ${(cat === 'All' ? !query : query === cat) ? 'active' : ''}`}
-            onClick={() => pickCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div className="loading-screen"><div className="spinner" /><span>Loading...</span></div>
-      ) : products.length === 0 ? (
-        <div className="empty-state">
-          <div className="icon">🔍</div>
-          <p>{query ? `No results for "${query}"` : 'No products available yet'}</p>
+    <div>
+      <section className="page-band">
+        <div className="container">
+          <h1>Browse products</h1>
+          <p>
+            {query ? `Results for “${query}”` : 'Find something from verified sellers across India.'}
+          </p>
+          <form onSubmit={handleSearch} className="search-bar" style={{ marginTop: 'var(--space-4)' }}>
+            <input
+              type="search"
+              placeholder="Search products…"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              aria-label="Search products"
+            />
+            <button type="submit" className="btn btn-primary"><Icon name="search" size={16} /> Search</button>
+          </form>
         </div>
-      ) : (
-        <>
-          <div className="grid-products">
-            {products.map(product => <ProductCard key={product.id} product={product} />)}
-          </div>
+      </section>
 
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button disabled={page === 0} onClick={() => goToPage(page - 1)}>← Prev</button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => (
-                <button key={i} className={page === i ? 'active' : ''} onClick={() => goToPage(i)}>{i + 1}</button>
+      <div className="container" style={{ paddingTop: 'var(--space-5)', paddingBottom: 'var(--space-8)' }}>
+        <div className="category-strip" style={{ marginBottom: 'var(--space-5)' }}>
+          {categories.map(cat => {
+            const active = cat.query === '' ? !query : query === cat.query;
+            return (
+              <button
+                key={cat.label}
+                className={`category-chip ${active ? 'active' : ''}`}
+                onClick={() => pickCategory(cat.query)}
+                aria-pressed={active}
+              >
+                {cat.hue && <span className="category-dot" style={{ background: cat.hue }} aria-hidden="true" />}
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {loading ? (
+          <div className="loading-screen"><div className="spinner" /><span>Loading…</span></div>
+        ) : products.length === 0 ? (
+          <div className="empty-state">
+            <span className="icon"><Icon name="search" size={48} /></span>
+            <p>{query ? `No results for “${query}”` : 'No products available yet'}</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid-products">
+              {products.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAdd={handleAdd}
+                  adding={addingId === product.id}
+                />
               ))}
-              <button disabled={page >= totalPages - 1} onClick={() => goToPage(page + 1)}>Next →</button>
             </div>
-          )}
-        </>
-      )}
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button disabled={page === 0} onClick={() => goToPage(page - 1)} aria-label="Previous page">
+                  <Icon name="arrowLeft" size={16} />
+                </button>
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => (
+                  <button key={i} className={page === i ? 'active' : ''} onClick={() => goToPage(i)}>
+                    {i + 1}
+                  </button>
+                ))}
+                <button disabled={page >= totalPages - 1} onClick={() => goToPage(page + 1)} aria-label="Next page">
+                  <Icon name="arrowRight" size={16} />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function Login() {
           Sign in to your account
         </p>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>⚠️ {error}</div>}
+        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
           <div className="input-group">
@@ -50,7 +50,7 @@ export default function Login() {
               value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Link to="/forgot-password" className="text-sm" style={{ color: 'var(--accent-light)' }}>
+            <Link to="/forgot-password" className="text-sm" style={{ color: 'var(--brand)' }}>
               Forgot password?
             </Link>
           </div>

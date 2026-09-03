@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersAPI } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import Icon from '../../components/Icon';
 
 const statusBadge = (status) => {
   const map = {
@@ -32,7 +33,7 @@ export default function MyOrders() {
 
       {orders.length === 0 ? (
         <div className="empty-state">
-          <div className="icon">📋</div>
+          <span className="icon"><Icon name="file" size={32} /></span>
           <p>No orders yet</p>
           <Link to="/catalog" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>Start Shopping</Link>
         </div>

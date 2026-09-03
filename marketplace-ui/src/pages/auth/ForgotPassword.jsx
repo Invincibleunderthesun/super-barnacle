@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -32,11 +33,11 @@ export default function ForgotPassword() {
 
         {sent ? (
           <div className="alert alert-success">
-            ✅ Password reset email sent! Check your inbox.
+            <Icon name="check" size={16} /> Password reset email sent! Check your inbox.
           </div>
         ) : (
           <>
-            {error && <div className="alert alert-error mb-md">⚠️ {error}</div>}
+            {error && <div className="alert alert-error mb-md"><Icon name="info" size={16} /> {error}</div>}
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
               <div className="input-group">
                 <label>Email</label>

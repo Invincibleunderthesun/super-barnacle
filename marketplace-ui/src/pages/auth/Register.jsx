@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function Register() {
   const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
@@ -41,7 +42,7 @@ export default function Register() {
           Sign up as a buyer
         </p>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>⚠️ {error}</div>}
+        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}><Icon name="info" size={16} /> {error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
           <div className="input-group">

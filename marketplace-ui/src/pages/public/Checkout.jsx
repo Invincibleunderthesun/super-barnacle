@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { addressAPI, ordersAPI, cartAPI } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import Icon from '../../components/Icon';
 
 export default function Checkout() {
   const { user } = useAuth();
@@ -31,7 +32,7 @@ export default function Checkout() {
     setPlacing(true);
     setError('');
     try {
-      const res = await ordersAPI.checkout(user.id, selectedAddress);
+      await ordersAPI.checkout(user.id, selectedAddress);
       navigate(`/dashboard/orders`);
     } catch (err) {
       setError(err.message || 'Checkout failed');
@@ -48,34 +49,35 @@ export default function Checkout() {
   const total = subtotal + gst;
 
   return (
-    <div className="container" style={{ padding: 'var(--space-xl) var(--space-lg)', maxWidth: '800px' }}>
-      <h1 style={{ marginBottom: 'var(--space-lg)' }}>Checkout</h1>
+    <div className="container" style={{ padding: 'var(--space-xl) var(--space-lg)', maxWidth: '820px' }}>
+      <h1 className="page-title-cart" style={{ marginBottom: 'var(--space-lg)' }}>
+        <Icon name="creditCard" size={22} /> Checkout
+      </h1>
 
-      {error && <div className="alert alert-error mb-md">⚠️ {error}</div>}
+      {error && <div className="alert alert-error mb-md"><Icon name="info" size={16} /> {error}</div>}
 
-      {/* Address Selection */}
       <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-        <h3 style={{ marginBottom: 'var(--space-md)' }}>📍 Delivery Address</h3>
+        <h3 className="card-title"><Icon name="mapPin" size={18} /> Delivery address</h3>
         {addresses.length === 0 ? (
-          <p className="text-secondary text-sm">No addresses saved. Go to <a href="/dashboard/addresses">My Addresses</a> to add one.</p>
+          <p className="text-muted text-sm">
+            No addresses saved. <Link to="/dashboard/addresses">Add an address</Link> to continue.
+          </p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+          <div className="address-list">
             {addresses.map(addr => (
-              <label key={addr.id} style={{
-                display: 'flex', alignItems: 'flex-start', gap: 'var(--space-md)',
-                padding: 'var(--space-md)', borderRadius: 'var(--radius-md)',
-                border: `1px solid ${selectedAddress === addr.id ? 'var(--accent)' : 'var(--border-color)'}`,
-                background: selectedAddress === addr.id ? 'rgba(124,58,237,0.05)' : 'transparent',
-                cursor: 'pointer',
-              }}>
-                <input type="radio" name="address" checked={selectedAddress === addr.id}
-                  onChange={() => setSelectedAddress(addr.id)} style={{ marginTop: '0.25rem' }} />
+              <label key={addr.id} className={`address-option ${selectedAddress === addr.id ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="address"
+                  checked={selectedAddress === addr.id}
+                  onChange={() => setSelectedAddress(addr.id)}
+                />
                 <div>
-                  <p style={{ fontWeight: 600 }}>{addr.fullName}</p>
-                  <p className="text-secondary text-sm">
+                  <p className="address-name">{addr.fullName}</p>
+                  <p className="text-muted text-sm">
                     {addr.addressLine1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}, {addr.city}, {addr.state} - {addr.pincode}
                   </p>
-                  <p className="text-secondary text-sm">📞 {addr.phone}</p>
+                  <p className="text-muted text-sm"><Icon name="user" size={13} /> {addr.phone}</p>
                 </div>
               </label>
             ))}
@@ -83,31 +85,23 @@ export default function Checkout() {
         )}
       </div>
 
-      {/* Order Summary */}
       <div className="card">
-        <h3 style={{ marginBottom: 'var(--space-md)' }}>📋 Order Summary</h3>
-        {items.map(item => (
-          <div key={item.id} style={{
-            display: 'flex', justifyContent: 'space-between', padding: 'var(--space-sm) 0',
-            borderBottom: '1px solid var(--border-color)',
-          }}>
-            <span>{item.product?.name} × {item.quantity}</span>
-            <span>₹{(item.product?.price * item.quantity).toLocaleString()}</span>
-          </div>
-        ))}
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-sm) 0', color: 'var(--text-secondary)' }}>
-          <span>Subtotal</span><span>₹{subtotal.toLocaleString()}</span>
+        <h3 className="card-title"><Icon name="file" size={18} /> Order summary</h3>
+        <div className="order-lines">
+          {items.map(item => (
+            <div key={item.id} className="order-line">
+              <span>{item.product?.name} <span className="text-muted">× {item.quantity}</span></span>
+              <span>₹{Number(item.product?.price * item.quantity || 0).toLocaleString('en-IN')}</span>
+            </div>
+          ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-sm) 0', color: 'var(--text-secondary)' }}>
-          <span>GST (18%)</span><span>₹{gst.toFixed(2)}</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-md) 0', fontWeight: 700, fontSize: '1.2rem', borderTop: '1px solid var(--border-color)' }}>
-          <span>Total</span><span className="price">₹{total.toFixed(2)}</span>
-        </div>
+        <div className="order-line muted"><span>Subtotal</span><span>₹{subtotal.toLocaleString('en-IN')}</span></div>
+        <div className="order-line muted"><span>GST (18%)</span><span>₹{gst.toFixed(2)}</span></div>
+        <div className="order-total"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
 
         <button className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 'var(--space-md)' }}
           onClick={handlePlaceOrder} disabled={placing || !selectedAddress}>
-          {placing ? 'Placing order...' : '🛒 Place Order'}
+          <Icon name="shield" size={18} /> {placing ? 'Placing order…' : 'Place order'}
         </button>
       </div>
     </div>

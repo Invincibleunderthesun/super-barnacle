@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sellersAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function SellerProducts() {
   const [products, setProducts] = useState([]);
@@ -124,7 +125,7 @@ export default function SellerProducts() {
       {/* Product Table */}
       {products.length === 0 ? (
         <div className="empty-state">
-          <div className="icon">📦</div>
+          <span className="icon"><Icon name="package" size={32} /></span>
           <p>No products yet. Add your first product!</p>
         </div>
       ) : (
@@ -152,8 +153,8 @@ export default function SellerProducts() {
                   <td className="text-secondary">{p.category || '—'}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>✏️</button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(p.id)}>🗑️</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}><Icon name="edit" size={16} /></button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(p.id)}><Icon name="trash" size={16} /></button>
                     </div>
                   </td>
                 </tr>

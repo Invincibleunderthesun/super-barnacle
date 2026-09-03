@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sellersAPI, ordersAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({});
@@ -24,26 +25,26 @@ export default function AdminOverview() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 'var(--space-lg)' }}>🔧 Admin Dashboard</h2>
+      <h2 style={{ marginBottom: 'var(--space-lg)' }}>Admin Dashboard</h2>
 
       <div className="grid-4" style={{ marginBottom: 'var(--space-xl)' }}>
         <div className="stat-card">
-          <span className="stat-icon">📊</span>
+          <span className="stat-icon"><Icon name="dashboard" size={20} /></span>
           <span className="stat-label">Total Orders</span>
           <span className="stat-value">{stats.totalOrders || 0}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">💰</span>
+          <span className="stat-icon"><Icon name="coins" size={20} /></span>
           <span className="stat-label">Revenue</span>
           <span className="stat-value">₹{(stats.totalRevenue || 0).toLocaleString()}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">🏪</span>
+          <span className="stat-icon"><Icon name="store" size={20} /></span>
           <span className="stat-label">Sellers</span>
           <span className="stat-value">{sellers.length}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-icon">📅</span>
+          <span className="stat-icon"><Icon name="refresh" size={20} /></span>
           <span className="stat-label">This Month</span>
           <span className="stat-value">{stats.ordersThisMonth || 0}</span>
         </div>
@@ -70,9 +71,9 @@ export default function AdminOverview() {
                   <td className="text-secondary">{s.commissionRate}%</td>
                   <td>
                     {!s.verified ? (
-                      <button className="btn btn-primary btn-sm" onClick={() => handleVerify(s.id, true)}>✅ Verify</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => handleVerify(s.id, true)}><Icon name="check" size={14} /> Verify</button>
                     ) : (
-                      <button className="btn btn-danger btn-sm" onClick={() => handleVerify(s.id, false)}>❌ Revoke</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleVerify(s.id, false)}><Icon name="info" size={14} /> Revoke</button>
                     )}
                   </td>
                 </tr>

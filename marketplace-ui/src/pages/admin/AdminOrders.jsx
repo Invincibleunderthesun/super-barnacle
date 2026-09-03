@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ordersAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 const statusBadge = (s) => ({
   PAYMENT_PENDING: 'badge-pending', CONFIRMED: 'badge-paid', PROCESSING: 'badge-shipped',
@@ -23,7 +24,7 @@ export default function AdminOrders() {
     <div>
       <h2 style={{ marginBottom: 'var(--space-lg)' }}>All Orders</h2>
       {orders.length === 0 ? (
-        <div className="empty-state"><div className="icon">📋</div><p>No orders yet</p></div>
+        <div className="empty-state"><span className="icon"><Icon name="file" size={32} /></span><p>No orders yet</p></div>
       ) : (
         <div className="table-container">
           <table>

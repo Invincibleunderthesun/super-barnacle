@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productsAPI, cartAPI } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import Icon from '../../components/Icon';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,7 +12,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     productsAPI.getById(id)
@@ -25,10 +26,10 @@ export default function ProductDetail() {
     setAddingToCart(true);
     try {
       await cartAPI.add(user.id, product.id, qty);
-      setMessage('✅ Added to cart!');
-      setTimeout(() => setMessage(''), 3000);
+      setMessage({ type: 'success', text: 'Added to cart' });
+      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      setMessage({ type: 'error', text: err.message });
     } finally {
       setAddingToCart(false);
     }
@@ -37,66 +38,72 @@ export default function ProductDetail() {
   if (loading) return <div className="loading-screen"><div className="spinner" /><span>Loading...</span></div>;
   if (!product) return (
     <div className="container empty-state" style={{ padding: 'var(--space-3xl)' }}>
-      <div className="icon">🔍</div>
+      <span className="icon"><Icon name="search" size={48} /></span>
       <p>Product not found</p>
-      <Link to="/catalog" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>Browse Catalog</Link>
+      <Link to="/catalog" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>Browse catalog</Link>
     </div>
   );
 
+  const inStock = product.stock > 0;
+
   return (
     <div className="container" style={{ padding: 'var(--space-xl) var(--space-lg)' }}>
-      <Link to="/catalog" className="text-secondary text-sm" style={{ display: 'inline-block', marginBottom: 'var(--space-lg)' }}>
-        ← Back to Catalog
+      <Link to="/catalog" className="back-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginBottom: 'var(--space-lg)' }}>
+        <Icon name="arrowLeft" size={16} /> Back to catalog
       </Link>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2xl)', alignItems: 'start' }}>
-        {/* Image */}
-        <div style={{
-          height: '400px', background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem',
-          border: '1px solid var(--border-color)', overflow: 'hidden',
-        }}>
+      <div className="pd-grid">
+        <div className="pd-media">
           {product.imageUrl ? (
-            <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : '📦'}
+            <img src={product.imageUrl} alt={product.name} />
+          ) : (
+            <span className="product-fallback">
+              <Icon name="package" size={72} strokeWidth={1.25} />
+            </span>
+          )}
         </div>
 
-        {/* Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <div className="pd-info">
           <div>
-            <p className="text-secondary text-sm">{product.category || 'General'}</p>
-            <h1 style={{ fontSize: '1.75rem', marginTop: '0.25rem' }}>{product.name}</h1>
+            <span className="product-category">{product.category || 'General'}</span>
+            <h1 className="pd-title">{product.name}</h1>
           </div>
-          <div className="price" style={{ fontSize: '2rem' }}>₹{product.price?.toLocaleString()}</div>
-          <p className="text-secondary" style={{ lineHeight: 1.7 }}>{product.description || 'No description available.'}</p>
+          <div className="pd-price">₹{Number(product.price || 0).toLocaleString('en-IN')}</div>
+          <p className="pd-desc">{product.description || 'No description available.'}</p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-            <span className={`badge ${product.stock > 0 ? 'badge-paid' : 'badge-cancelled'}`}>
-              {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
+          <div className="pd-meta">
+            <span className={`badge ${inStock ? 'badge-success' : 'badge-neutral'}`}>
+              <span className="dot" aria-hidden="true" />
+              {inStock ? `${product.stock} in stock` : 'Out of stock'}
             </span>
             {product.seller && (
-              <Link to={`/seller/${product.seller.id}`} className="text-sm">
+              <Link to={`/seller/${product.seller.id}`} className="pd-seller">
                 by {product.seller.storeName || 'Seller'}
               </Link>
             )}
           </div>
 
-          {product.stock > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', marginTop: 'var(--space-sm)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <button className="btn btn-secondary btn-sm" onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
-                <span style={{ minWidth: '2rem', textAlign: 'center', fontWeight: 600 }}>{qty}</span>
-                <button className="btn btn-secondary btn-sm" onClick={() => setQty(Math.min(product.stock, qty + 1))}>+</button>
+          {inStock && (
+            <div className="pd-buy">
+              <div className="qty-control">
+                <button className="btn btn-secondary btn-sm" onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease quantity">
+                  <Icon name="minus" size={14} />
+                </button>
+                <span className="qty-value">{qty}</span>
+                <button className="btn btn-secondary btn-sm" onClick={() => setQty(Math.min(product.stock, qty + 1))} aria-label="Increase quantity">
+                  <Icon name="plus" size={14} />
+                </button>
               </div>
-              <button className="btn btn-primary btn-lg" onClick={handleAddToCart} disabled={addingToCart}
-                style={{ flex: 1 }}>
-                {addingToCart ? 'Adding...' : '🛒 Add to Cart'}
+              <button className="btn btn-primary btn-lg" onClick={handleAddToCart} disabled={addingToCart} style={{ flex: 1 }}>
+                <Icon name="bag" size={18} /> {addingToCart ? 'Adding…' : 'Add to cart'}
               </button>
             </div>
           )}
 
           {message && (
-            <div className={`alert ${message.startsWith('✅') ? 'alert-success' : 'alert-error'}`}>{message}</div>
+            <div className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'}`}>
+              <Icon name={message.type === 'success' ? 'check' : 'info'} size={16} /> {message.text}
+            </div>
           )}
         </div>
       </div>

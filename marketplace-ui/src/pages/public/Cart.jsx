@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cartAPI } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import Icon from '../../components/Icon';
 
 export default function Cart() {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ export default function Cart() {
   useEffect(() => { fetchCart(); }, [user]);
 
   const updateQty = async (productId, newQty) => {
+    if (newQty < 1) return;
     try {
       await cartAPI.updateQty(user.id, productId, newQty);
       fetchCart();
@@ -41,60 +43,60 @@ export default function Cart() {
 
   return (
     <div className="container" style={{ padding: 'var(--space-xl) var(--space-lg)', maxWidth: '900px' }}>
-      <h1 style={{ marginBottom: 'var(--space-lg)' }}>🛒 Your Cart</h1>
+      <h1 className="page-title-cart" style={{ marginBottom: 'var(--space-lg)' }}><Icon name="cart" size={22} /> Your cart</h1>
 
       {items.length === 0 ? (
         <div className="empty-state">
-          <div className="icon">🛍️</div>
+          <span className="icon"><Icon name="bag" size={48} /></span>
           <p>Your cart is empty</p>
-          <Link to="/catalog" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>Browse Products</Link>
+          <Link to="/catalog" className="btn btn-primary" style={{ marginTop: 'var(--space-md)' }}>Browse products</Link>
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {items.map(item => (
-              <div key={item.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-lg)' }}>
-                <div style={{
-                  width: '80px', height: '80px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', flexShrink: 0,
-                  overflow: 'hidden',
-                }}>
+              <div key={item.id} className="card cart-item">
+                <div className="cart-item-media">
                   {item.product?.imageUrl ? (
-                    <img src={item.product.imageUrl} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : '📦'}
+                    <img src={item.product.imageUrl} alt={item.product.name} />
+                  ) : (
+                    <span className="cart-item-fallback"><Icon name="package" size={24} /></span>
+                  )}
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link to={`/product/${item.product?.id}`} style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {item.product?.name}
-                  </Link>
-                  <p className="text-secondary text-sm">₹{item.product?.price?.toLocaleString()} each</p>
+                <div className="cart-item-name">
+                  <Link to={`/product/${item.product?.id}`}>{item.product?.name}</Link>
+                  <p className="text-muted text-sm">₹{Number(item.product?.price || 0).toLocaleString('en-IN')} each</p>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <button className="btn btn-secondary btn-sm" onClick={() => updateQty(item.product?.id, item.quantity - 1)}>−</button>
-                  <span style={{ fontWeight: 600, minWidth: '1.5rem', textAlign: 'center' }}>{item.quantity}</span>
-                  <button className="btn btn-secondary btn-sm" onClick={() => updateQty(item.product?.id, item.quantity + 1)}>+</button>
+                <div className="qty-control">
+                  <button className="btn btn-secondary btn-sm" onClick={() => updateQty(item.product?.id, item.quantity - 1)} aria-label="Decrease quantity">
+                    <Icon name="minus" size={14} />
+                  </button>
+                  <span className="qty-value">{item.quantity}</span>
+                  <button className="btn btn-secondary btn-sm" onClick={() => updateQty(item.product?.id, item.quantity + 1)} aria-label="Increase quantity">
+                    <Icon name="plus" size={14} />
+                  </button>
                 </div>
 
-                <span className="price" style={{ minWidth: '80px', textAlign: 'right' }}>
-                  ₹{(item.product?.price * item.quantity).toLocaleString()}
+                <span className="cart-item-price">
+                  ₹{Number(item.product?.price * item.quantity || 0).toLocaleString('en-IN')}
                 </span>
 
-                <button className="btn btn-ghost btn-sm" onClick={() => removeItem(item.product?.id)} title="Remove">
-                  🗑️
+                <button className="btn btn-ghost btn-icon" onClick={() => removeItem(item.product?.id)} aria-label="Remove item" title="Remove">
+                  <Icon name="trash" size={18} />
                 </button>
               </div>
             ))}
           </div>
 
-          <div className="card" style={{ marginTop: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="card cart-summary">
             <div>
-              <p className="text-secondary text-sm">Subtotal ({items.length} items)</p>
-              <p className="price" style={{ fontSize: '1.5rem' }}>₹{total.toLocaleString()}</p>
+              <p className="text-muted text-sm">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
+              <p className="pd-price">₹{total.toLocaleString('en-IN')}</p>
             </div>
             <button className="btn btn-primary btn-lg" onClick={() => navigate('/checkout')}>
-              Proceed to Checkout →
+              Proceed to checkout <Icon name="arrowRight" size={18} />
             </button>
           </div>
         </>

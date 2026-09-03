@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { addressAPI } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import Icon from '../../components/Icon';
 
 export default function MyAddresses() {
   const { user } = useAuth();
@@ -83,7 +84,7 @@ export default function MyAddresses() {
       )}
 
       {addresses.length === 0 ? (
-        <div className="empty-state"><div className="icon">📍</div><p>No addresses saved</p></div>
+        <div className="empty-state"><span className="icon"><Icon name="mapPin" size={32} /></span><p>No addresses saved</p></div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
           {addresses.map(a => (
@@ -94,12 +95,12 @@ export default function MyAddresses() {
                   {a.default && <span className="badge badge-paid">Default</span>}
                 </div>
                 <p className="text-secondary text-sm">{a.addressLine1}{a.addressLine2 ? `, ${a.addressLine2}` : ''}, {a.city}, {a.state} - {a.pincode}</p>
-                <p className="text-muted text-sm">📞 {a.phone}</p>
+                <p className="text-muted text-sm"><Icon name="creditCard" size={14} /> {a.phone}</p>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                 {!a.default && <button className="btn btn-ghost btn-sm" onClick={() => handleSetDefault(a.id)}>Set Default</button>}
-                <button className="btn btn-ghost btn-sm" onClick={() => openEdit(a)}>✏️</button>
-                <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(a.id)}>🗑️</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => openEdit(a)}><Icon name="edit" size={16} /></button>
+                <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(a.id)}><Icon name="trash" size={16} /></button>
               </div>
             </div>
           ))}

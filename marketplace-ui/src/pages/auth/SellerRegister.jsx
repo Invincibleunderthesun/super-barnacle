@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../api';
+import Icon from '../../components/Icon';
 
 export default function SellerRegister() {
   const [form, setForm] = useState({
@@ -33,12 +34,12 @@ export default function SellerRegister() {
   return (
     <div style={{ minHeight: 'calc(100vh - var(--navbar-height))', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-xl)' }}>
       <div className="card" style={{ width: '100%', maxWidth: '520px' }}>
-        <h2 style={{ marginBottom: '0.25rem' }}>🏪 Become a Seller</h2>
+        <h2 style={{ marginBottom: '0.25rem' }}><Icon name="store" size={20} /> Become a Seller</h2>
         <p className="text-secondary text-sm" style={{ marginBottom: 'var(--space-lg)' }}>
           Set up your store and start selling on MarketHub
         </p>
 
-        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>⚠️ {error}</div>}
+        {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}><Icon name="info" size={16} /> {error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
           <h4 style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-sm)' }}>Account Info</h4>
@@ -79,7 +80,7 @@ export default function SellerRegister() {
 
           <button type="submit" className="btn btn-primary btn-lg" disabled={loading}
             style={{ width: '100%', marginTop: 'var(--space-sm)' }}>
-            {loading ? 'Creating store...' : '🚀 Create My Store'}
+            {loading ? 'Creating store...' : 'Create My Store'}
           </button>
         </form>
 

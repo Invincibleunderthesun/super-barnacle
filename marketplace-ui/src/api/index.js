@@ -26,11 +26,11 @@ export const productsAPI = {
 export const cartAPI = {
   get: (userId) => api.get(`/cart/user/${userId}`),
   add: (userId, productId, quantity = 1) =>
-    api.post(`/cart/user/${userId}/add?productId=${productId}&quantity=${quantity}`),
+    api.post(`/cart/user/${userId}/add/${productId}?quantity=${quantity}`),
   remove: (userId, productId) =>
-    api.delete(`/cart/user/${userId}/remove?productId=${productId}`),
+    api.delete(`/cart/user/${userId}/remove/${productId}`),
   updateQty: (userId, productId, quantity) =>
-    api.put(`/cart/user/${userId}/update?productId=${productId}&quantity=${quantity}`),
+    api.patch(`/cart/user/${userId}/item/${productId}?quantity=${quantity}`),
   clear: (userId) => api.delete(`/cart/user/${userId}/clear`),
 };
 
@@ -63,11 +63,11 @@ export const sellersAPI = {
 };
 
 export const addressAPI = {
-  getAll: (userId) => api.get(`/addresses/user/${userId}`),
-  create: (userId, data) => api.post(`/addresses/user/${userId}`, data),
+  getAll: () => api.get(`/addresses`),
+  create: (data) => api.post(`/addresses`, data),
   update: (id, data) => api.put(`/addresses/${id}`, data),
   delete: (id) => api.delete(`/addresses/${id}`),
-  setDefault: (userId, id) => api.put(`/addresses/user/${userId}/default/${id}`),
+  setDefault: (id) => api.patch(`/addresses/${id}/default`),
 };
 
 export const paymentsAPI = {

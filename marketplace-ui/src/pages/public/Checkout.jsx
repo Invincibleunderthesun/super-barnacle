@@ -16,7 +16,7 @@ export default function Checkout() {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      addressAPI.getAll(user.id).then(res => {
+      addressAPI.getAll().then(res => {
         const addrs = res.data || [];
         setAddresses(addrs);
         const def = addrs.find(a => a.default) || addrs[0];

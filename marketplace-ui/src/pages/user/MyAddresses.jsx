@@ -14,7 +14,7 @@ export default function MyAddresses() {
 
   const fetchAddresses = () => {
     setLoading(true);
-    addressAPI.getAll(user.id)
+    addressAPI.getAll()
       .then(res => setAddresses(res.data || []))
       .catch(() => setAddresses([]))
       .finally(() => setLoading(false));
@@ -30,7 +30,7 @@ export default function MyAddresses() {
     setSaving(true); setError('');
     try {
       if (editId) await addressAPI.update(editId, form);
-      else await addressAPI.create(user.id, form);
+      else await addressAPI.create(form);
       setShowForm(false); fetchAddresses();
     } catch (err) { setError(err.message || 'Failed to save'); }
     finally { setSaving(false); }
@@ -42,7 +42,7 @@ export default function MyAddresses() {
   };
 
   const handleSetDefault = async (id) => {
-    try { await addressAPI.setDefault(user.id, id); fetchAddresses(); } catch {}
+    try { await addressAPI.setDefault(id); fetchAddresses(); } catch {}
   };
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });

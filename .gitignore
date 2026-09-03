@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Logs & scratch
+*.log
+build_*.txt
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (frontend handled in marketplace-ui/.gitignore too)
+node_modules/
+dist/

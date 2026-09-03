@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment & Secrets ###
+.env
+.env.*
+!.env.example
+
+### Logs ###
+*.log
+
+### Docker overrides ###
+docker-compose.override.yml
